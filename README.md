@@ -52,4 +52,6 @@ Recv: quando a mensagem chega na subrede, a mensagem enviada é apresentada (mre
 
 ## Modo de execução do simulador
 
+```
 $ simulador <topofile> <cmdfile>
+```
