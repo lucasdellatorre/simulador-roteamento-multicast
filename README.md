@@ -1,4 +1,4 @@
-# simulador-roteamento-multicast
+# Simulador de roteamento multicast
 
 O simulador deve receber como parâmetros de execução o nome de um arquivo de descrição de topologia (conforme formato especificado) e um arquivo contendo comandos a serem executados na topologia (conforme formato especificado). O simulador deve apresentar na saída as mensagens enviadas pelos roteadores e subredes da topologia conforme o formato estabelecido, considerando a execução dos comandos indicados no arquivo de entrada.
 
