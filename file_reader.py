@@ -38,8 +38,8 @@ class FileReader():
     def parse_router(self, router: str):
         router = router.split(",")
         
-        rid = router[0]
-        numifs = router[1]
+        rid      = router[0]
+        numifs   = router[1]
         ips_mask = router[2:]
         
         return Router(id=rid, interfaces_num=numifs, ips=ips_mask)
@@ -47,10 +47,10 @@ class FileReader():
     def parse_router_table(self, router_table: str):
         router_table = router_table.split(",")
         
-        rid = router_table[0]
+        rid     = router_table[0]
         netaddr = router_table[1]
         nexthop = router_table[2]
-        ifnum = router_table[3]
+        ifnum   = router_table[3]
         
         return RouterTable(id=rid, netaddr=netaddr, next_hop=nexthop, interface_num=ifnum)
         
