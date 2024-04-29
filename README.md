@@ -4,17 +4,22 @@ O simulador deve receber como parâmetros de execução o nome de um arquivo de 
 
 ## Formato do arquivo de descrição de topologia
 
+```
 #SUBNET
 <sid>,<netaddr/mask>
 #ROUTER
 <rid>,<numifs>,<ip1/mask>,<ip2/mask>,<ip3/mask>...
 #ROUTERTABLE
 <rid>,<netaddr/mask>,<nexthop>,<ifnum>
-Formato do arquivo de execução
+```
 
+## Formato do arquivo de execução
+
+```
 <command> <params>
 <command> <params>
 ...
+```
 
 ## Os comandos que devem ser suportados são:
 
