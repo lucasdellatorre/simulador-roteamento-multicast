@@ -1,7 +1,7 @@
 import os.path
 
 from router import Router
-from router_table import RouterTable
+from router_table import RouterTable, RouterTableRegistry
 from subnet import Subnet
 from backbone import BackBone
 
@@ -15,15 +15,15 @@ class FileReader():
         with open(self.filename) as f:
             content = f.readlines()
             
-        for current_line, next_line in zip(content, content[1:]):
-            current_line = current_line.strip()
-            next_line = next_line.strip()
+        for index in range(len(content) - 1):
+            current_line = content[index].strip()
+            next_line = content[index + 1].strip()
             if current_line == '#SUBNET':
                 subnet = self.parse_subnet(next_line)
             elif current_line == "#ROUTER":
                 router = self.parse_router(next_line)
             elif current_line == "#ROUTERTABLE":
-                router_table = self.parse_router_table(next_line)
+                router_table = self.parse_router_table(content[index+1:])
             
         return BackBone(subnet=subnet, router=router, router_table=router_table)
     
@@ -44,14 +44,19 @@ class FileReader():
         
         return Router(id=rid, interfaces_num=numifs, ips=ips_mask)
         
-    def parse_router_table(self, router_table: str):
-        router_table = router_table.split(",")
+    def parse_router_table(self, router_table: list):
+        router_table_registries = []
         
-        rid     = router_table[0]
-        netaddr = router_table[1]
-        nexthop = router_table[2]
-        ifnum   = router_table[3]
+        for router_table_registry in router_table_registries:
+            router_table_registry = router_table_registry.strip().split(",")
+            
+            rid     = router_table_registry[0]
+            netaddr = router_table_registry[1]
+            nexthop = router_table_registry[2]
+            ifnum   = router_table_registry[3]
+            
+            router_table.append(RouterTableRegistry(id=rid, netaddr=netaddr, next_hop=nexthop, interface_num=ifnum))
         
-        return RouterTable(id=rid, netaddr=netaddr, next_hop=nexthop, interface_num=ifnum)
+        return RouterTable(router_table_registries=router_table)
         
 
