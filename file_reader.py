@@ -1,9 +1,11 @@
 import os.path
+from typing import Set
 
 from router import Router
-from router_table import RouterTable, RouterTableRegistry
+from router_table import RouterTableRegistry
 from subnet import Subnet
 from backbone import BackBone
+from exec_instructions import ExecInstructions
 
 class FileReader():
     def __init__(self, filename):
@@ -14,18 +16,24 @@ class FileReader():
     def get_backbone(self):
         with open(self.filename) as f:
             content = f.readlines()
-            
-        for index in range(len(content) - 1):
+    
+        subnets = []
+        routers = []
+
+        registers = ['#SUBNET', '#ROUTER', '#ROUTERTABLE']
+        current_registering = []
+        for index in range(len(content)):
             current_line = content[index].strip()
-            next_line = content[index + 1].strip()
-            if current_line == '#SUBNET':
-                subnet = self.parse_subnet(next_line)
-            elif current_line == "#ROUTER":
-                router = self.parse_router(next_line)
-            elif current_line == "#ROUTERTABLE":
-                router_table = self.parse_router_table(content[index+1:])
+            if registers.__contains__(current_line):
+                current_registering = current_line
+            elif current_registering == '#SUBNET':
+                subnets.append(self.parse_subnet(current_line))
+            elif current_registering == "#ROUTER":
+                routers.append(self.parse_router(current_line))
+            elif current_registering == "#ROUTERTABLE":
+                self.parse_router_table(current_line, routers, subnets)
             
-        return BackBone(subnet=subnet, router=router, router_table=router_table)
+        return BackBone(subnets, routers)
     
     def parse_subnet(self, subnet: str):
         subnet = subnet.split(",")
@@ -39,24 +47,41 @@ class FileReader():
         router = router.split(",")
         
         rid      = router[0]
-        numifs   = router[1]
-        ips_mask = router[2:]
+        numifs = router[1]
+        interfaces = router[2:]
         
-        return Router(id=rid, interfaces_num=numifs, ips=ips_mask)
+        return Router(id=rid, interfaces_num=numifs, interfaces=interfaces)
         
-    def parse_router_table(self, router_table: list):
-        router_table_registries = []
+    def parse_router_table(self, table_line, router_list, subnet_list):
+        router = None
+        table_line = table_line.strip().split(",")
+        for rtr in router_list:
+            if rtr.id == table_line[0]:
+                router = rtr
+                break
+
         
-        for router_table_registry in router_table_registries:
-            router_table_registry = router_table_registry.strip().split(",")
+        netaddr = table_line[1]
+        nexthop = table_line[2]
+        ifnum   = table_line[3]
+        
+        router.addRouterTableRegistry(RouterTableRegistry(netaddr=netaddr, next_hop=nexthop, interface_num=ifnum))
+
+        if nexthop.__contains__('0.0.0.0'):
+            for subnet in subnet_list:
+                if subnet.netaddr == netaddr:
+                    subnet.add_main_router(router)
+                    break
+    
+    def parse_execution_from_exec_file(self):
+        with open(self.filename) as f:
+            content = f.readlines()
+        instructions = []
+
+        for line in content:
+            line = line.strip().split(' ')
+            instructions.append(ExecInstructions(line[0], line[1], line[2], line[3] if len(line) > 3 else None))
             
-            rid     = router_table_registry[0]
-            netaddr = router_table_registry[1]
-            nexthop = router_table_registry[2]
-            ifnum   = router_table_registry[3]
-            
-            router_table.append(RouterTableRegistry(id=rid, netaddr=netaddr, next_hop=nexthop, interface_num=ifnum))
-        
-        return RouterTable(router_table_registries=router_table)
+        return instructions
         
 

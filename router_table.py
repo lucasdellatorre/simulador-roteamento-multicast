@@ -1,23 +1,11 @@
-class RouterTable():
-    def __init__(self, router_table_registries: list):
-        self.router_table_registries = router_table_registries
-        
-    def __str__(self):
-        string = "#ROUTERTABLE\n"
-        for registry in self.router_table_registries:
-            string = string + registry
-        return string
-        
 class RouterTableRegistry():
-    def __init__(self, id: str, netaddr: str, next_hop: str, interface_num: int):
-        self.id = id
+    def __init__(self, netaddr: str, next_hop: str, interface_num: int):
         self.netaddr = netaddr
         self.next_hop = next_hop
         self.interface_num = interface_num
         
     def __str__(self):
-        string = string + f'router table id: {self.id}\n' 
-        string = string + f'netaddr/mask: {self.netaddr}\n'
+        string = f'netaddr/mask: {self.netaddr}\n'
         string = string + f'next hop: {self.next_hop}\n'
         string = string + f'interface count: {self.interface_num}'
         return string
