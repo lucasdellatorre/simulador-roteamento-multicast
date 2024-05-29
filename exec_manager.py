@@ -15,4 +15,4 @@ class ExecManager:
             elif instruction.cmd == 'mping':
                 print(f'Pinging {subnet.id} to {group}')
             elif instruction.cmd == 'mleave':
-                print(f'Leaving {group} from {subnet.id}')
+                subnet.mleave(group)

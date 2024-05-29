@@ -15,7 +15,7 @@ class Router():
         for routerTableRegistry in self.routerTable:
             string = string + f'\nregistry: \n{routerTableRegistry}'
         for groupId in self.groupTable:
-            string = string + f'\ngroup: {groupId} subnets: {self.groupTable[groupId]}'
+            string = string + f'\ngroup: {groupId} subnets: {self.groupTable[groupId]}\n'
         return string
     
     def addRouterTableRegistry(self, routerTableRegistry: RouterTableRegistry):
@@ -25,3 +25,9 @@ class Router():
         if groupId not in self.groupTable:
             self.groupTable[groupId] = []
         self.groupTable[groupId].append(subNetId)
+
+    def mleave(self, subNetId: str, groupId: str):
+        if groupId in self.groupTable:
+            self.groupTable[groupId].remove(subNetId)
+            if len(self.groupTable[groupId]) == 0:
+                del self.groupTable[groupId]
