@@ -30,4 +30,4 @@ class Subnet():
     def mping(self, groupId: str, msg: str):
         if self.mainRouter is not None:
             print(f'{self.id} =>> {self.mainRouter.id} : mping {groupId} {msg};')
-            self.mainRouter.mping(groupId, msg)
+            self.mainRouter.mping(self.id, groupId, msg)

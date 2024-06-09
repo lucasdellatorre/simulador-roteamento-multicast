@@ -34,10 +34,10 @@ class Router():
             if len(self.groupTable[groupId]) == 0:
                 del self.groupTable[groupId]
                 
-    def mping(self, groupId: int, msg: str):
+    def mping(self, subnetSrcId: int, groupId: int, msg: str):
         package = {
             "hop": 0,   
-            "subnet_src": self.id,
+            "subnet_src": subnetSrcId,
             "group_target": groupId,
             "msg": msg
         }
@@ -50,12 +50,11 @@ class Router():
         if hasNextRouter:
             self.mprune(package)
         
-        # verifica quantos grupos esse roteador conhece de acordo com suas subnets
-
+        # ping
         subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
         print(f'{subnet_messages} : mping {groupId} {msg};')
                 
-        self.mrecv(groupId, msg)
+        self.mrecv(subnetSrcId, groupId, msg)
                 
         
         
@@ -70,9 +69,11 @@ class Router():
         pass
 
     # quando a mensagem chega na subrede, a mensagem enviada é apresentada (mrecv)
-    def mrecv(self, groupId: int, msg: str):
-        pass
-        # for gId in self.groupTable:
-        #     if gId == groupId:
+    def mrecv(self, subnetSrcId: int, groupId: int, msg: str):
+        for subnetId in self.groupTable[groupId]:
+            print(f'{subnetId} box {subnetId} : {groupId}#{msg} from {subnetSrcId};')
+            
+            
+        
                 
                 
