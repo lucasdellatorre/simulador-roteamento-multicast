@@ -26,3 +26,8 @@ class Subnet():
         if self.mainRouter is not None:
             self.mainRouter.mleave(self.id, groupId)
             print(f'{self.id} => {self.mainRouter.id} : mleave {groupId};')
+            
+    def mping(self, groupId: str, msg: str):
+        if self.mainRouter is not None:
+            self.mainRouter.mping(groupId, msg)
+            print(f'{self.id} =>> {self.mainRouter.id} : mping {groupId} {msg};')

@@ -9,10 +9,11 @@ class ExecManager:
         for instruction in self.execution_instructions:
             subnet = self.backbone.findSubnet(instruction.subnet)
             group = instruction.group
+            msg = instruction.msg
 
             if instruction.cmd == 'mjoin':
                 subnet.mjoin(group)
             elif instruction.cmd == 'mping':
-                print(f'Pinging {subnet.id} to {group}')
+                subnet.mping(group, msg)
             elif instruction.cmd == 'mleave':
                 subnet.mleave(group)
