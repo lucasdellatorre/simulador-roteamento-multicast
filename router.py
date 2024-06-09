@@ -51,10 +51,13 @@ class Router():
             self.mprune(package)
         
         # verifica quantos grupos esse roteador conhece de acordo com suas subnets
-        for gId in self.groupTable:
-            if gId == groupId:
-                subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
-                print(f'{subnet_messages} : mping {groupId} {msg};')
+
+        subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
+        print(f'{subnet_messages} : mping {groupId} {msg};')
+                
+        self.mrecv(groupId, msg)
+                
+        
         
     # é enviado um pacote de inundação (mflood) entre os roteadores da rede 
     # utilizando RPF para evitar loops
@@ -67,9 +70,9 @@ class Router():
         pass
 
     # quando a mensagem chega na subrede, a mensagem enviada é apresentada (mrecv)
-    def mrecv(self):
+    def mrecv(self, groupId: int, msg: str):
         pass
-
-
-        
-        
+        # for gId in self.groupTable:
+        #     if gId == groupId:
+                
+                
