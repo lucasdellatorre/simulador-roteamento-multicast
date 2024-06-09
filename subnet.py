@@ -19,15 +19,15 @@ class Subnet():
 
     def mjoin(self, groupId: str):
         if self.mainRouter is not None:
-            self.mainRouter.mjoin(self.id, groupId)
             print(f'{self.id} => {self.mainRouter.id} : mjoin {groupId};')
+            self.mainRouter.mjoin(self.id, groupId)
 
     def mleave(self, groupId: str):
         if self.mainRouter is not None:
-            self.mainRouter.mleave(self.id, groupId)
             print(f'{self.id} => {self.mainRouter.id} : mleave {groupId};')
+            self.mainRouter.mleave(self.id, groupId)
             
     def mping(self, groupId: str, msg: str):
         if self.mainRouter is not None:
-            self.mainRouter.mping(groupId, msg)
             print(f'{self.id} =>> {self.mainRouter.id} : mping {groupId} {msg};')
+            self.mainRouter.mping(groupId, msg)

@@ -49,14 +49,9 @@ class Router():
             
         if hasNextRouter:
             self.mprune(package)
-            
-        # ping
-        
-        print(self.groupTable)
         
         # verifica quantos grupos esse roteador conhece de acordo com suas subnets
         for gId in self.groupTable:
-            print("olha o if moco", gId)
             if gId == groupId:
                 subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
                 print(f'{subnet_messages} : mping {groupId} {msg};')
