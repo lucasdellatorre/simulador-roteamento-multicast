@@ -62,16 +62,24 @@ class FileReader():
 
         
         netaddr = table_line[1]
-        nexthop = table_line[2]
-        ifnum   = table_line[3]
-        
-        router.addRouterTableRegistry(RouterTableRegistry(netaddr=netaddr, next_hop=nexthop, interface_num=ifnum))
-
-        if nexthop.__contains__('0.0.0.0'):
+        nexthop = None
+        for rtr in router_list:
+            if router.id != rtr.id:
+                for interface in rtr.interfaces:
+                    if interface.__contains__(table_line[2]):
+                        nexthop = rtr
+                        break
+        if nexthop is None:
             for subnet in subnet_list:
                 if subnet.netaddr == netaddr:
                     subnet.add_main_router(router)
+                    nexthop = subnet
                     break
+        ifnum   = table_line[3]
+        # print(nexthop)
+        
+        router.addRouterTableRegistry(RouterTableRegistry(netaddr=netaddr, next_hop=nexthop, interface_num=ifnum))
+
     
     def parse_execution_from_exec_file(self):
         with open(self.filename) as f:
