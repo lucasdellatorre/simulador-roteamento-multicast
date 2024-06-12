@@ -36,10 +36,11 @@ class Router():
             if len(self.groupTable[groupId]) == 0:
                 del self.groupTable[groupId]
                 
-    def mpingStarter(self, subnetSrcId: int, groupId: int, msg: str, messageId: int):
+    def mpingStarter(self, subnetSrcId: int, subnetAddr: str, groupId: int, msg: str, messageId: int):
         package = {
             "hop": 0,   
             "subnet_src": subnetSrcId,
+            "subnet_addr": subnetAddr,
             "group_target": groupId,
             "msg": msg,
             "messageId": messageId
@@ -57,17 +58,18 @@ class Router():
         self.routersToSendCurrentMessage = []
 
     def mping(self, subnetSrcId: int, groupId: int, msg: str, messageId: int):  
+        if self.groupTable.get(groupId) is not None:
+            # ping
+            subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
+            print(f'{subnet_messages} : mping {groupId} {msg};')    
+            self.mrecv(subnetSrcId, groupId, msg)
+            
         if len(self.routersToSendCurrentMessage) > 0:    
             router_message = ', '.join(f'{self.id} =>> {router.id}' for router in self.routersToSendCurrentMessage)
             print(f'{router_message} : mping {groupId} {msg};')
             for router in self.routersToSendCurrentMessage:
                 router.mping(subnetSrcId, groupId, msg, messageId)
 
-        if self.groupTable.get(groupId) is not None:
-            # ping
-            subnet_messages = ', '.join(f'{self.id} =>> {subnet}' for subnet in self.groupTable[groupId])
-            print(f'{subnet_messages} : mping {groupId} {msg};')    
-            self.mrecv(subnetSrcId, groupId, msg)
 
     
     # é enviado um pacote de inundação (mflood) entre os roteadores da rede 
@@ -77,7 +79,8 @@ class Router():
         for routerTableRegistry in self.routerTable:
             # pega da tabela de roteamento apenas os roteadores tirando o que enviou o flood para ele
             if type(routerTableRegistry.next_hop) is Router and routerTableRegistry.next_hop.id != receivedFrom:
-                routers.append(routerTableRegistry.next_hop)
+                if routerTableRegistry.next_hop not in routers:
+                    routers.append(routerTableRegistry.next_hop)
         finalList = routers.copy()
         if len(routers) != 0: 
             router_message = ', '.join(f'{self.id} >> {router.id}' for router in routers)
@@ -88,14 +91,14 @@ class Router():
             # Descobre quais roteadores ignoraram a mensagem dele (RPF) para evitar loops
             # Descobre quais roteadores vão mandar uma mensagem de prune (Na vida real não é assim, mas para o trabalho funciona)
             for i in range(len(routers)):
-                value = routers[i].mfloodReceive(new_package)
+                value = routers[i].mfloodReceive(new_package, self.id)
                 if value == 1: #prune ou ignorado, não repassar
                     finalList.remove(routers[i])
-                elif value == 0:
-                    prunedList.append(routers[i])
             # Manda os roteadores que sobraram fazer o flood, mesmo os de prune fazem
             for router in finalList:
-                router.mfloodStart(new_package, self.id)
+                isPrune = router.mfloodStart(new_package, self.id)
+                if isPrune == False:
+                    prunedList.append(router)
             # Remove os roteadores do prune para que eles não recebam a mensagem
             for router in prunedList:
                 finalList.remove(router)
@@ -104,20 +107,36 @@ class Router():
                 
     # Recebe a mensagem de flood e decide o que fazer com ela
     # 0 é prune, 1 é ignorado e 2 é flood aceito e repassado
-    def mfloodReceive(self, package):
-        if package["messageId"] not in self.messagesReceivedDict or package["hop"] < self.messagesReceivedDict[package["messageId"]]:
+    def mfloodReceive(self, package, receivedFrom):
+        # if package["messageId"] not in self.messagesReceivedDict or package["hop"] < self.messagesReceivedDict[package["messageId"]]:
+        if self.findSourceIdInRouterTable(package["subnet_addr"], receivedFrom) == True:
             self.messagesReceivedDict[package["messageId"]] = package["hop"]
-            if package["group_target"] not in self.groupTable:
-                return 0
-            else:
-                return 2
-        else:
-            return 1
+            return 2
+            # else:
+                # print(receivedFrom, self.id)
+            # if package["messageId"] not in self.messagesReceivedDict or package["hop"] < self.messagesReceivedDict[package["messageId"]]:
+            #     self.messagesReceivedDict[package["messageId"]] = package["hop"]
+            #     return 2
+            # else:
+            #     isSource = self.findSourceIdInRouterTable(package["subnet_src"], receivedFrom)
+            #     if isSource == True:
+            #         self.messagesReceivedDict[package["messageId"]] = package["hop"]
+            #     return 2
+        return 1
+        
+    def findSourceIdInRouterTable(self, sourceId, receivedFrom):
+        for routerTableRegistry in self.routerTable:
+            # print(routerTableRegistry.netaddr, sourceId, routerTableRegistry.next_hop.id, receivedFrom)
+            if routerTableRegistry.netaddr == sourceId and routerTableRegistry.next_hop.id == receivedFrom:
+                return True
+        return False
             
     def mfloodStart(self, package, receivedFrom):
         self.routersToSendCurrentMessage = self.mflood(package, receivedFrom)
-        if package["group_target"] not in self.groupTable:
+        if package["group_target"] not in self.groupTable and len(self.routersToSendCurrentMessage) == 0:
             self.mprune(receivedFrom, package["group_target"])
+            return False
+        return True
     
     # é enviada uma mensagem mprune para "bloquear" o tráfego multicast
     # de um grupo específico para um roteador
