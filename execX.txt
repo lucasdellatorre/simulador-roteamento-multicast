@@ -1,0 +1,11 @@
+mjoin s10 g1
+mjoin s50 g1
+mjoin s40 g1
+mjoin s41 g1
+mjoin s70 g1
+mping s10 g1 mgs_1
+mleave s10 g1
+mleave s50 g1
+mleave s40 g1
+mleave s41 g1
+mleave s70 g1

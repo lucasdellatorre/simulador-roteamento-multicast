@@ -30,5 +30,5 @@ class Subnet():
     def mping(self, groupId: str, msg: str, msgId: int):
         if self.mainRouter is not None:
             print(f'{self.id} =>> {self.mainRouter.id} : mping {groupId} {msg};')
-            self.mainRouter.mpingStarter(self.id, groupId, msg, msgId)
+            self.mainRouter.mpingStarter(self.id, self.netaddr, groupId, msg, msgId)
             
