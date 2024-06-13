@@ -1,0 +1,6 @@
+mjoin s2 g1
+mping s1 g1 Hello
+mjoin s4 g1
+mping s1 g1 World
+mleave s2 g1
+mleave s4 g1
