@@ -1,7 +1,0 @@
-mjoin s40 g1
-mjoin s41 g1
-mjoin s71 g1
-mping s42 g1 mgs_1
-mleave s40 g1
-mleave s41 g1
-mleave s71 g1

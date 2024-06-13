@@ -1,7 +1,0 @@
-s3 => r2 : mjoin g1;
-s1 =>> r1 : mping g1 Hello;
-r1 >> r2 : mflood g1;
-r1 =>> r2 : mping g1 Hello;
-r2 =>> s3 : mping g1 Hello;
-s3 box s3 : g1#Hello from s1;
-s3 => r2 : mleave g1;
